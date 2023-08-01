@@ -40,10 +40,19 @@ def preprocess_data(data_file: pathlib.Path) -> tuple[tf.Tensor, tf.Tensor]:
     X = data[:, :-1]
     y = tf.expand_dims(data[:, -1], axis=-1)
     
+    # Normalize data
+    X_normalizer = tf.keras.layers.Normalization()
+    y_normalizer = tf.keras.layers.Normalization()
+    X_normalizer.adapt(X)
+    y_normalizer.adapt(y)
+    X = X_normalizer(X)
+    y = y_normalizer(y)
+
     return X, y
 
 if __name__ == "__main__":
     # Load data
     data_file = pathlib.Path("data/train.csv")
     X, y = preprocess_data(data_file)
+    print(X, y)
     print(X.shape, y.shape)
