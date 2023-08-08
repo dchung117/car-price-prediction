@@ -1,5 +1,8 @@
 import pathlib
+from typing import Optional
+
 import numpy as np
+import matplotlib.pyplot as plt
 import tensorflow as tf
 
 from src.preprocess import preprocess_data
@@ -12,7 +15,7 @@ LOSSES = {
 }
 
 def train(model: tf.keras.Model, X: tf.Tensor, y: tf.Tensor, 
-    batch_size: int = 32, n_epochs: int = 100):
+    batch_size: int = 32, n_epochs: int = 100) -> tuple[tf.keras.Model, tf.keras.callbacks.History]:
     """
     Function to train a model.
     
@@ -26,12 +29,40 @@ def train(model: tf.keras.Model, X: tf.Tensor, y: tf.Tensor,
     :dtype: int
     :param: n_epochs: Number of training epochs (def. 100).
     :dtype: int
-    :return: trained model
-    :rtype: tf.keras.Model
+    :return: trained model and training history
+    :rtype: tuple[tf.keras.Model, tf.keras.callbacks.History]
     """
-    model.fit(X, y, epochs=n_epochs, batch_size=batch_size, verbose=1)
-    return model
+    hist = model.fit(X, y, epochs=n_epochs, batch_size=batch_size, verbose=1)
+    return model, hist
 
+def save_plot(x: np.ndarray, y: np.ndarray, save_file: pathlib.Path, x_label: Optional[str] = None, 
+    y_label: Optional[str] = None, title: Optional[str] = None,
+    ) -> None:
+    """
+    Creates and saves plot of training metrics.
+    
+    :param: x: x-axis data
+    :dtype: np.ndarray
+    :param: y: y-axis data (metric)
+    :dtype: np.ndarray
+    :param: save_file: path to save figure
+    :dtype: pathlib.Path
+    :param: x_label: optional x-axis label
+    :dtype: Optional[str]
+    :param: y_label: optional y-axis label
+    :dtype: Optional[str]
+    :param: title: optional title
+    :dtype: Optional[str]
+    """
+    plt.plot(x, y)
+    if title:
+        plt.title(title)
+    if x_label:
+        plt.xlabel(x_label)
+    if y_label:
+        plt.ylabel(y_label)
+    plt.savefig(save_file)
+    
 if __name__ == "__main__":
     # Load, preprocess data
     data_file = pathlib.Path("data/train.csv")
@@ -42,6 +73,15 @@ if __name__ == "__main__":
     model.compile(optimizer=tf.keras.optimizers.Adam(), loss=LOSSES["mae"]())
     tf.keras.utils.plot_model(model, to_file="model.png", show_shapes=True)
 
-    model = train(model, X, y)
+    # Train model
+    hist, model = train(model, X, y)
+    save_plot(
+        np.arange(len(hist.history.history["loss"])),
+        hist.history.history["loss"],
+        pathlib.Path("train_loss.png"),
+        x_label="Epoch",
+        y_label="Loss"
+    )
+
 
 
