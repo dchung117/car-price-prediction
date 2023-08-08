@@ -15,7 +15,8 @@ FEAT_COLS = [
 
 TARGET_COL = "current price"
 
-def preprocess_data(data_file: pathlib.Path) -> tuple[tf.Tensor, tf.Tensor]:
+def preprocess_data(data_file: pathlib.Path) \
+    -> tuple[tf.Tensor, tf.Tensor, tf.keras.layers.Normalization, tf.keras.layers.Normalization]:
     """
     Prepare data for training.
     
@@ -48,11 +49,11 @@ def preprocess_data(data_file: pathlib.Path) -> tuple[tf.Tensor, tf.Tensor]:
     X = X_normalizer(X)
     y = y_normalizer(y)
 
-    return X, y
+    return X, y, X_normalizer, y_normalizer
 
 if __name__ == "__main__":
     # Load data
     data_file = pathlib.Path("data/train.csv")
-    X, y = preprocess_data(data_file)
+    X, y, X_normalizer, y_normalizer = preprocess_data(data_file)
     print(X, y)
     print(X.shape, y.shape)
