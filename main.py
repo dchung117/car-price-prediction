@@ -54,13 +54,14 @@ def save_plot(x: np.ndarray, y: np.ndarray, save_file: pathlib.Path, x_label: Op
     :param: title: optional title
     :dtype: Optional[str]
     """
-    plt.plot(x, y)
+    fig, ax = plt.subplots()
+    ax.plot(x, y)
     if title:
-        plt.title(title)
+        ax.title(title)
     if x_label:
-        plt.xlabel(x_label)
+        ax.set_xlabel(x_label)
     if y_label:
-        plt.ylabel(y_label)
+        ax.set_ylabel(y_label)
     plt.savefig(save_file)
     
 if __name__ == "__main__":
@@ -70,18 +71,29 @@ if __name__ == "__main__":
     
     # Create model
     model = get_model(X_normalizer, n_feats=X.shape[1])
-    model.compile(optimizer=tf.keras.optimizers.Adam(), loss=LOSSES["mae"]())
+    model.compile(optimizer=tf.keras.optimizers.Adam(),
+        loss=LOSSES["mae"](),
+        metrics=tf.keras.metrics.RootMeanSquaredError())
     tf.keras.utils.plot_model(model, to_file="model.png", show_shapes=True)
 
     # Train model
-    hist, model = train(model, X, y)
+    model, hist = train(model, X, y)
     save_plot(
-        np.arange(len(hist.history.history["loss"])),
-        hist.history.history["loss"],
+        np.arange(len(hist.history["loss"])),
+        hist.history["loss"],
         pathlib.Path("train_loss.png"),
         x_label="Epoch",
         y_label="Loss"
     )
+    save_plot(
+        np.arange(len(hist.history["root_mean_squared_error"])),
+        hist.history["root_mean_squared_error"],
+        pathlib.Path("train_rmse.png"),
+        x_label="Epoch",
+        y_label="RMSE"
+    )
 
+    # Evaluate model
+    model.evaluate(X, y, verbose=1)
 
 
