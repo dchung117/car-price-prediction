@@ -11,7 +11,8 @@ LOSSES = {
     "huber": tf.keras.losses.Huber
 }
 
-def train(model: tf.keras.Model, X: tf.Tensor, y: tf.Tensor, n_epochs: int = 100):
+def train(model: tf.keras.Model, X: tf.Tensor, y: tf.Tensor, 
+    batch_size: int = 32, n_epochs: int = 100):
     """
     Function to train a model.
     
@@ -21,12 +22,14 @@ def train(model: tf.keras.Model, X: tf.Tensor, y: tf.Tensor, n_epochs: int = 100
     :dtype: tf.Tensor
     :param: y: Model training target tensor.
     :dtype: tf.Tensor
-    :param: n_epochs: Number of training epochs (def. 100)
+    :param: batch_size: Training batch size (def. 32).
+    :dtype: int
+    :param: n_epochs: Number of training epochs (def. 100).
     :dtype: int
     :return: trained model
     :rtype: tf.keras.Model
     """
-    model.fit(X, y, epochs=n_epochs, verbose=1)
+    model.fit(X, y, epochs=n_epochs, batch_size=batch_size, verbose=1)
     return model
 
 if __name__ == "__main__":
@@ -36,7 +39,7 @@ if __name__ == "__main__":
     
     # Create model
     model = get_model(X_normalizer, n_feats=X.shape[1])
-    model.compile(loss=LOSSES["mae"]())
+    model.compile(optimizer=tf.keras.optimizers.Adam(), loss=LOSSES["mae"]())
     tf.keras.utils.plot_model(model, to_file="model.png", show_shapes=True)
 
     model = train(model, X, y)
