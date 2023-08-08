@@ -1,4 +1,5 @@
 import pathlib
+import numpy as np
 import tensorflow as tf
 
 from src.preprocess import preprocess_data
@@ -10,8 +11,23 @@ LOSSES = {
     "huber": tf.keras.losses.Huber
 }
 
-def train(model: tf.keras.Model):
-    pass
+def train(model: tf.keras.Model, X: tf.Tensor, y: tf.Tensor, n_epochs: int = 100):
+    """
+    Function to train a model.
+    
+    :param: model: Keras model to train.
+    :dtype: tf.keras.Model
+    :param: X: Model training input tensor.
+    :dtype: tf.Tensor
+    :param: y: Model training target tensor.
+    :dtype: tf.Tensor
+    :param: n_epochs: Number of training epochs (def. 100)
+    :dtype: int
+    :return: trained model
+    :rtype: tf.keras.Model
+    """
+    model.fit(X, y, epochs=n_epochs, verbose=1)
+    return model
 
 if __name__ == "__main__":
     # Load, preprocess data
@@ -20,7 +36,9 @@ if __name__ == "__main__":
     
     # Create model
     model = get_model(X_normalizer, n_feats=X.shape[1])
-    model.compile(loss=LOSSES["mse"])
+    model.compile(loss=LOSSES["mae"]())
     tf.keras.utils.plot_model(model, to_file="model.png", show_shapes=True)
+
+    model = train(model, X, y)
 
 
