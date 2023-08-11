@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 
 from src.preprocess import preprocess_data, train_val_test_split
-from src.model import get_model
+from src.model import get_linear_model, get_mlp
 from src.utils import save_plot, predict
 
 LOSSES = {
@@ -58,7 +58,8 @@ if __name__ == "__main__":
     y_normalizer.adapt(y_train)
 
     # Create model
-    model = get_model(X_normalizer, n_feats=X.shape[1])
+    model = get_mlp(X_normalizer, n_feats=X.shape[1],
+        hidden_layer_sizes=[32, 32, 32])
     model.compile(optimizer=tf.keras.optimizers.Adam(),
         loss=LOSSES["mae"](),
         metrics=tf.keras.metrics.RootMeanSquaredError())
