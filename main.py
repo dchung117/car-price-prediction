@@ -14,6 +14,10 @@ LOSSES = {
     "huber": tf.keras.losses.Huber
 }
 
+TRAIN_FRACTION = 0.8
+VAL_FRACTION = 0.1
+TEST_FRACTION = 0.1
+
 def train(model: tf.keras.Model, X: tf.Tensor, y: tf.Tensor, 
     batch_size: int = 32, n_epochs: int = 100) -> tuple[tf.keras.Model, tf.keras.callbacks.History]:
     """
@@ -69,6 +73,16 @@ if __name__ == "__main__":
     data_file = pathlib.Path("data/train.csv")
     X, y, X_normalizer, y_normalizer = preprocess_data(data_file)
     
+    # Split data into train, val, test
+    X_train, y_train = X[:int(len(X)*TRAIN_FRACTION)], y[:int(len(X)*TRAIN_FRACTION)]
+    X_val, y_val = X[int(len(X)*TRAIN_FRACTION):int(len(X)*(TRAIN_FRACTION+VAL_FRACTION))], \
+        y[int(len(X)*TRAIN_FRACTION):int(len(X)*(TRAIN_FRACTION+VAL_FRACTION))]
+    X_test, y_test =X[-int(len(X)*TEST_FRACTION):], y[-int(len(X)*TEST_FRACTION):]
+    print("Training size: ", X_train.shape[0])
+    print("Validation size: ", X_val.shape[0])
+    print("Test size: ", X_test.shape[0])
+
+
     # Create model
     model = get_model(X_normalizer, n_feats=X.shape[1])
     model.compile(optimizer=tf.keras.optimizers.Adam(),
