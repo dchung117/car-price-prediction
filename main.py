@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
     # Create model
     model = get_mlp(X_normalizer, n_feats=X.shape[1],
-        hidden_layer_sizes=[32, 32, 32])
+        hidden_layer_sizes=[16, 16, 16])
     model.compile(optimizer=tf.keras.optimizers.Adam(),
         loss=LOSSES["mae"](),
         metrics=tf.keras.metrics.RootMeanSquaredError())
