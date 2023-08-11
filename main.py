@@ -7,7 +7,7 @@ import tensorflow as tf
 
 from src.preprocess import preprocess_data, train_val_test_split
 from src.model import get_model
-from src.utils import save_plot
+from src.utils import save_plot, predict
 
 LOSSES = {
     "mse": tf.keras.losses.MeanSquaredError,
@@ -88,4 +88,8 @@ if __name__ == "__main__":
     # Evaluate model on test set
     model.evaluate(X_test, y_test, verbose=1)
 
-
+    # Get prediction on test example
+    x_ex, y_ex = X_test[0], y_test[0].numpy()[0]
+    y_pred = predict(x_ex, model)
+    print("Car price prediction: ", y_pred)
+    print("Prediction error: ", y_pred - y_ex)

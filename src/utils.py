@@ -3,6 +3,8 @@ from typing import Iterable, Optional
 import numpy as np
 import matplotlib.pyplot as plt
 
+import tensorflow as tf
+
 def save_plot(x: np.ndarray, y: Iterable[np.ndarray], save_file: pathlib.Path, x_label: Optional[str] = None, 
     y_label: Optional[str] = None, title: Optional[str] = None,
     legend: Optional[Iterable[str]] = None
@@ -39,3 +41,18 @@ def save_plot(x: np.ndarray, y: Iterable[np.ndarray], save_file: pathlib.Path, x
     if len(legend):
         ax.legend(legend)
     plt.savefig(save_file)
+
+def predict(X: tf.Tensor, model: tf.keras.Model) -> tf.Tensor:
+    """
+    Make car price prediction w/ trained model.
+    
+    :param: X - input car feature vector
+    :dtype: tf.Tensor
+    :param: model - trained model
+    :dtype: tf.keras.Model
+    :return: car price prediction
+    :dtype: tf.Tensor
+    """
+    if X.ndim == 1:
+        X = tf.expand_dims(X, axis=0)
+    return model.predict(X).item()
